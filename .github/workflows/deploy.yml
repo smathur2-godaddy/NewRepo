@@ -27,7 +27,7 @@ jobs:
         run: |
           echo -e "$PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem 
-
+ 
           echo "Adding EC2 instance to known hosts..."
           ssh-keyscan -H $HOST >> ~/.ssh/known_hosts  # ✅ Fix: Avoid host verification errors
 
