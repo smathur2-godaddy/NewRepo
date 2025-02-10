@@ -25,22 +25,22 @@ jobs:
           HOST: ${{ secrets.EC2_HOST }}  # EC2 Public IP stored in GitHub Secrets
           USER: ec2-user
         run: |
-          echo -e "$PRIVATE_KEY" > private_key.pem
+          echo "$PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem 
- 
-          echo "Adding EC2 instance to known hosts..."
-          ssh-keyscan -H $HOST >> ~/.ssh/known_hosts  # ✅ Fix: Avoid host verification errors
+          
+          # FIX: Ensure ~/.ssh directory exists
+          mkdir -p ~/.ssh  
+          ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts  
 
-          echo "Copying JAR to EC2..."
-          scp -i private_key.pem -o StrictHostKeyChecking=no target/*.jar $USER@$HOST:~/app.jar  # ✅ Fix: Disable strict checking
-
-          echo "Restarting application..."
-          ssh -i private_key.pem -o StrictHostKeyChecking=no $USER@$HOST << 'EOF'
+          # Copy JAR file to EC2
+          scp -i private_key.pem target/*.jar $USER@$HOST:~/app.jar
+          
+          # Restart the application on EC2
+          ssh -i private_key.pem $USER@$HOST << 'EOF'
             echo "Stopping existing application..."
             pkill -f "java -jar" || echo "No process found."
-
             echo "Starting new application..."
             nohup java -jar ~/app.jar > app.log 2>&1 &
-
             echo "Deployment completed successfully!"
           EOF
