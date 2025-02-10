@@ -9,29 +9,38 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'  # Update based on your setup
+
       - name: Build JAR
         run: mvn clean package -DskipTests
+
       - name: Deploy to EC2
         env:
           PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}  # SSH Key stored in GitHub Secrets
           HOST: ${{ secrets.EC2_HOST }}  # EC2 Public IP stored in GitHub Secrets
           USER: ec2-user
         run: |
-          # Create the private key file
-          echo "$PRIVATE_KEY" > private_key.pem
-          chmod 600 private_key.pem  # Ensure correct permissions
-          # Copy the JAR file to EC2
-          scp -i private_key.pem target/*.jar $USER@$HOST:~/app.jar
-          # SSH into EC2 and restart the application
-          ssh -i private_key.pem $USER@$HOST << 'EOF'
+          echo -e "$PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem 
+
+          echo "Adding EC2 instance to known hosts..."
+          ssh-keyscan -H $HOST >> ~/.ssh/known_hosts  # ✅ Fix: Avoid host verification errors
+
+          echo "Copying JAR to EC2..."
+          scp -i private_key.pem -o StrictHostKeyChecking=no target/*.jar $USER@$HOST:~/app.jar  # ✅ Fix: Disable strict checking
+
+          echo "Restarting application..."
+          ssh -i private_key.pem -o StrictHostKeyChecking=no $USER@$HOST << 'EOF'
             echo "Stopping existing application..."
             pkill -f "java -jar" || echo "No process found."
+
             echo "Starting new application..."
             nohup java -jar ~/app.jar > app.log 2>&1 &
+
             echo "Deployment completed successfully!"
           EOF
