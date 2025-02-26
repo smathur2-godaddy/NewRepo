@@ -58,7 +58,7 @@
 	<distributionManagement>
     <repository>
         <id>github</id> <!-- Must match the 'server-id' in the workflow -->
-        <url>https://maven.pkg.github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME</url>
+        <url>https://maven.pkg.github.com/smathur2/NewRepo</url>
     </repository>
 </distributionManagement>
 
