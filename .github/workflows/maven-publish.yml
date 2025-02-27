@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'temurin'
       - name: Set up Maven settings
         run: |
@@ -21,12 +21,12 @@ jobs:
                   <servers>
                     <server>
                       <id>github</id>
-                      <username>${{ secrets.GITHUB_ACTOR }}</username>
-                      <password>${{ secrets.GITHUB_TOKEN }}</password>
+                      <username>${{ secrets.MY_GITHUB_ACTOR }}</username>
+                      <password>${{ secrets.MY_GITHUB_TOKEN }}</password>
                     </server>
                   </servers>
                 </settings>" > ~/.m2/settings.xml
       - name: Publish package
         run: mvn --batch-mode deploy
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
