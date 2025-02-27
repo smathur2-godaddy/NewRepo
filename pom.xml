@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>org.example</groupId>
 	<artifactId>spring-dynamodb</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<name>spring-dynamodb</name>
 	<description>Spring boot project to demonstrate CRUD operations with AWS DynamoDB</description>
 	<properties>
