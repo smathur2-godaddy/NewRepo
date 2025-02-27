@@ -14,18 +14,6 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Set up Maven settings
-        run: |
-          mkdir -p ~/.m2
-          echo "<settings>
-                  <servers>
-                    <server>
-                      <id>github</id>
-                      <username>${{ secrets.MY_GITHUB_ACTOR }}</username>
-                      <password>${{ secrets.MY_GITHUB_TOKEN }}</password>
-                    </server>
-                  </servers>
-                </settings>" > ~/.m2/settings.xml
       - name: Publish package
         run: mvn --batch-mode deploy
         env:
